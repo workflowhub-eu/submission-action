@@ -5,6 +5,9 @@ require 'yaml'
 
 raise "Missing API_TOKEN" if ENV['API_TOKEN'].nil?
 OUTPUT = File.open(ENV['GITHUB_OUTPUT'], 'w')
+puts "Switching to: #{ENV['GITHUB_WORKSPACE']}"
+Dir.chdir(ENV['GITHUB_WORKSPACE'])
+
 begin
   config = {}
   if File.exist?('.workflowhub.yml')
