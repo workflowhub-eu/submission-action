@@ -15,9 +15,13 @@ begin
     puts config.inspect
   end
 
+  puts "Arguments: #{ARGV.inspect}"
+
   team_id = config.delete('team_id') || ARGV[0]
-  instance = config.delete('instance') || ARGV[1] || 'https://workflowhub.eu'
+  puts "Team ID: #{team_id}"
   raise "Missing Team ID" if team_id.nil?
+  instance = config.delete('instance') || ARGV[1] || 'https://workflowhub.eu'
+  puts "Instance: #{instance}"
 
   url = "#{instance.chomp('/')}/workflows/submit"
   puts config.inspect
