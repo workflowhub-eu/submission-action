@@ -25,7 +25,7 @@ begin
   workflows = config['workflows'] || [config]
   puts workflows
   workflows.each_with_index do |workflow, i|
-    path = workflow.delete('path') || '/'
+    path = workflow.delete('path') || '.'
     metadata_path = Pathname.new(path).join('ro-crate-metadata.json')
     if metadata_path.exist?
       puts "Found: #{path}"
