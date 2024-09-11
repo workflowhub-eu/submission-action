@@ -1,0 +1,19 @@
+name: 'WorkflowHub Submission'
+description: 'Submit a workflow to WorkflowHub'
+inputs:
+  team_id:
+    description: 'ID of the WorkflowHub Team to own the submitted workflows'
+    required: true
+  instance:
+    description: 'URL of the WorkflowHub instance to submit to'
+    required: false
+    default: 'https://workflowhub.eu'
+outputs:
+  url: # id of output
+    description: 'URL of the WorkflowHub entry'
+    value: ${{ steps.workflowhub-submission.outputs.url }}
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.instance }}
