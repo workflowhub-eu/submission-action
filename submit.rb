@@ -27,8 +27,10 @@ workflows.each_with_index do |workflow, i|
   if metadata_path.exist?
     puts "Found: #{path}"
     crate = ROCrate::Reader.read(path)
-    puts "ID: #{crate.id} #{crate.url}"
-    puts "Version: #{crate.version}"
+    puts "ID: #{crate.id}"
+    puts "isBasedOn: #{crate['isBasedOn']}"
+    puts "url: #{crate['url']}"
+    puts "Version: #{crate['version']}"
     file = "crate-#{i}.crate.zip"
     puts "  Zipping... (#{file}"
     ROCrate::Writer.new(crate).write_zip(file)
