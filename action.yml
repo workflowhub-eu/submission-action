@@ -9,9 +9,9 @@ inputs:
     required: false
     default: 'https://workflowhub.eu'
 outputs:
-  url: # id of output
-    description: 'URL of the WorkflowHub entry'
-    value: ${{ steps.workflowhub-submission.outputs.url }}
+  workflow_urls: # id of output
+    description: 'URLs of the WorkflowHub entries registered'
+    value: ${{ steps.workflowhub-submission.outputs.workflow_urls }}
 runs:
   using: 'docker'
   image: 'Dockerfile'
