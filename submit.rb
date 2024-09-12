@@ -52,6 +52,7 @@ workflows.each_with_index do |workflow, i|
       exit 1
     else
       location = "#{instance.chomp('/')}#{response.dig('data', 'links', 'self')}"
+      workflow_urls << location
       puts "  Done: #{location}"
     end
   else
