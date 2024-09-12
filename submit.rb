@@ -20,19 +20,15 @@ puts "::debug::Instance: #{instance}"
 
 url = "#{instance.chomp('/')}/workflows/submit"
 workflows = config['workflows'] || [config]
-workflow_urls = []
+registered = []
 workflows.each_with_index do |workflow, i|
   path = workflow.delete('path') || '.'
   metadata_path = Pathname.new(path).join('ro-crate-metadata.json')
   if metadata_path.exist?
     puts "Found: #{path}"
     crate = ROCrate::Reader.read(path)
-    puts "ID: #{crate.id}"
-    puts "isBasedOn: #{crate['isBasedOn']}"
-    puts "url: #{crate['url']}"
-    puts "Version: #{crate['version']}"
     file = "crate-#{i}.crate.zip"
-    puts "  Zipping... (#{file}"
+    puts "  Zipping..."
     ROCrate::Writer.new(crate).write_zip(file)
 
     body = {
@@ -49,28 +45,35 @@ workflows.each_with_index do |workflow, i|
     puts "  Uploading..."
     begin
       response = JSON.parse(RestClient.post(url, body, **headers))
+      location = "#{instance.chomp('/')}#{response.dig('data', 'links', 'self')}"
+      registered << { name: crate['name'] || path, url: location }
+      puts "  Done: #{location}"
     rescue RestClient::ExceptionWithResponse => e
       STDERR.puts "Error uploading RO-Crate: #{e.message}"
       STDERR.puts e.http_body
       exit 1
-    else
-      location = "#{instance.chomp('/')}#{response.dig('data', 'links', 'self')}"
-      workflow_urls << location
-      puts "  Done: #{location}"
     end
   else
     raise "Couldn't find #{metadata_path}"
   end
   puts
-
-  File.open(ENV['GITHUB_OUTPUT'], 'w') do |out|
-    out.puts("workflow_urls<<EOF")
-    workflow_urls.each do |u|
-      out.puts(u)
-    end
-    out.puts("EOF")
-  end
 end
 
-File.write(ENV['GITHUB_STEP_SUMMARY'], "#{workflow_urls.count} workflows submitted")
+File.open(ENV['GITHUB_OUTPUT'], 'w') do |out|
+  out.puts("workflow_urls<<EOF")
+  registered.each do |w|
+    out.puts(w[:url])
+  end
+  out.puts("EOF")
+end
+
+summary = "#{registered.count} workflows submitted"
+if registered.any?
+  summary += "\n\n"
+  registered.each do |w|
+    summary += " - #{w[:name]} <#{w[:url]}>\n"
+  end
+end
+File.write(ENV['GITHUB_STEP_SUMMARY'], summary)
+
 puts "Finished!"
