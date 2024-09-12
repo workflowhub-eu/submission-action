@@ -7,7 +7,6 @@ raise "Missing API_TOKEN" if ENV['API_TOKEN'].nil?
 OUTPUT = File.open(ENV['GITHUB_OUTPUT'], 'w')
 puts "Switching to: #{ENV['GITHUB_WORKSPACE']}"
 Dir.chdir(ENV['GITHUB_WORKSPACE'])
-puts "::error title=test::error test"
 
 config = {}
 config = YAML.load_file('.workflowhub.yml') if File.exist?('.workflowhub.yml')
@@ -28,8 +27,10 @@ workflows.each_with_index do |workflow, i|
   if metadata_path.exist?
     puts "Found: #{path}"
     crate = ROCrate::Reader.read(path)
+    puts "ID: #{crate.id} #{crate.url}"
+    puts "Version: #{crate.version}"
     file = "crate-#{i}.crate.zip"
-    puts "  Zipping..."
+    puts "  Zipping... (#{file}"
     ROCrate::Writer.new(crate).write_zip(file)
 
     body = {
